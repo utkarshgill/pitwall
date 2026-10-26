@@ -2,7 +2,7 @@
 
 Small, readable event analytics. Current bricks: an event record, PostgreSQL storage, and a browser producer.
 
-An event has an ID, name, occurrence time, opaque actor/device ID, and JSON properties. Storage adds `received_at`. The actor ID is recorded as supplied; identity merging is a later decision.
+An event has an ID, name, occurrence time, opaque actor/device ID, and JSON properties. Storage adds `received_at`. The actor ID is recorded as supplied.
 
 [events.sql](events.sql) contains one PostgreSQL table and one append operation. Run the checks with Node.js 24 and pnpm; no Supabase project or running server is required:
 
@@ -24,7 +24,28 @@ select * from pitwall.events where id = 'e1';
 
 `append` returns true for a new event and false for an identical retry. The producer supplies occurrence time; storage adds receipt time. A reused ID with different facts raises an error. JSON object key order does not affect equality. Separate event IDs retain repeated actions, including actions with equal timestamps. The receipt time stays fixed on retries.
 
-This is one private dataset, accessible to its database owner. Project credentials, identity resolution and reports will be defined as separate, tested steps.
+This is one private dataset, accessible to its database owner. The host controls credentials and which records a caller may read.
+
+## Queries
+
+Install `identity.sql` and `report.sql` in PostgreSQL, or load them into PGlite. Neither creates tables or reads application data. `pitwall.identity(text[])` returns the sole distinct non-null actor among supplied links; empty or conflicting links return null. The host must select links within the caller's authorised scope before resolving identity.
+
+`pitwall.report(records, options)` accepts an array of event records and returns counts, daily series, people, timing and ordered conversion. It neither opens a connection nor resolves identity implicitly. Each record needs a unique ID and a resolved `distinct_id`. An optional `attributes` object passes through untouched; the engine does not interpret it.
+
+```sql
+select pitwall.report('[]', '{
+  "event":"Build finished",
+  "from":"2026-01-01T00:00:00Z", "to":"2026-02-01T00:00:00Z",
+  "steps":["Build started","Build finished"],
+  "sums":{"total_duration":"duration_ms"}
+}');
+```
+
+The interval excludes `from` and includes `to`; daily buckets use `timezone` (UTC by default). `measure` selects event occurrences or unique people. Period uniques are not the sum of daily uniques. `sums` maps output names to numeric properties. `person` narrows all results to one actor. Counts cover the whole input interval; event samples stop at 200 rows and people/funnel samples at 100.
+
+Funnel steps require separate occurrences in timestamp/ID order. Each person counts once, at their furthest stage. With `correlate:true`, the optional record `correlation` must agree across steps. Missing correlations may bridge steps only when `allow_unlinked:true` is explicitly supplied. This preserves independent attempts while preventing two known correlations from mixing. Conversion uses the supplied interval; there is no additional conversion window.
+
+`timing` supplies the event name and property keys, for example `{"event":"Activity","step":"step","duration":"ms"}`. `hidden_events` omits chosen names from event lists and the name index without discarding timing observations. `profile_property` selects the latest record carrying a chosen metadata property. Person and funnel rows retain their first event, so the host can attach its own labels without teaching the engine business concepts.
 
 ## Command line
 
