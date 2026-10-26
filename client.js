@@ -1,4 +1,5 @@
 // Capture and timing are independent of the host application's transport and data model.
+import {validateEvent} from './event.js';
 export function createPitwall({ send, key = () => crypto.randomUUID(), enabled = true, namespace = 'pitwall', views = {} }) {
   if (typeof send!=='function') throw new TypeError('A send function is required.');
   let visitor, session;
@@ -17,9 +18,9 @@ export function createPitwall({ send, key = () => crypto.randomUUID(), enabled =
     const os = /Android/i.test(ua) ? 'Android' : tablet || /iPhone|iPod/i.test(ua) ? 'iOS' : /Windows/i.test(ua) ? 'Windows' : /Mac/i.test(ua) ? 'macOS' : /Linux/i.test(ua) ? 'Linux' : 'Other';
     const browser = /Instagram|FBAN|FBAV/i.test(ua) ? 'Social in-app' : /; wv\)/i.test(ua) ? 'Android WebView' : /GSA\//i.test(ua) ? 'Google app' : /Edg/i.test(ua) ? 'Edge' : /Firefox|FxiOS/i.test(ua) ? 'Firefox' : /Chrome|CriOS/i.test(ua) ? 'Chrome' : /Safari/i.test(ua) ? 'Safari' : 'Other';
     try {
-      void Promise.resolve(send({id:key(),event,distinct_id:visitor,occurred_at:new Date().toISOString(),
+      void Promise.resolve(send(validateEvent({id:key(),event,distinct_id:visitor,occurred_at:new Date().toISOString(),
         properties:{...input,session_id:session,device,os,browser,
-          viewport:innerWidth<600 ? 'small' : innerWidth<1024 ? 'medium' : 'large'}})).catch(()=>{});
+          viewport:innerWidth<600 ? 'small' : innerWidth<1024 ? 'medium' : 'large'}}))).catch(()=>{});
     } catch { /* Analytics must not break a user action. */ }
   }
   function time(step, context = {}, priority = 0) {
