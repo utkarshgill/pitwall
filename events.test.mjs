@@ -44,8 +44,13 @@ test('distinct event IDs preserve repeated actions at the same time',async()=>{
   await append();await append({id:'e2'});assert.equal((await rows()).length,2);
 });
 
+test('an omitted occurrence time is assigned once, including across retries',async()=>{
+  assert.equal(await append({occurred_at:null}),true);const original=await rows();
+  assert.equal(await append({occurred_at:null}),false);assert.deepEqual(await rows(),original);
+});
+
 test('invalid facts cannot enter the store',async()=>{
-  for (const patch of [{id:''},{event:' '},{distinct_id:null},{occurred_at:null},{occurred_at:'infinity'},{properties:[]},{properties:null}])
+  for (const patch of [{id:''},{event:' '},{distinct_id:null},{occurred_at:'infinity'},{properties:[]},{properties:null}])
     await assert.rejects(append(patch));
   assert.equal((await rows()).length,0);
 });
