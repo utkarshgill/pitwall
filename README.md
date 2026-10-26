@@ -1,6 +1,6 @@
 # Pitwall
 
-Small, readable event analytics. The first brick is an event store.
+Small, readable event analytics. Current bricks: an event record, PostgreSQL storage, and a browser producer.
 
 An event has an ID, name, occurrence time, opaque actor/device ID, and JSON properties. Storage adds `received_at`. The actor ID is recorded as supplied; identity merging is a later decision.
 
@@ -24,7 +24,20 @@ select * from pitwall.events where id = 'e1';
 
 `append` returns true for a new event and false for an identical retry. The producer supplies occurrence time; storage adds receipt time. A reused ID with different facts raises an error. JSON object key order does not affect equality. Separate event IDs retain repeated actions, including actions with equal timestamps. The receipt time stays fixed on retries.
 
-This is one private dataset, accessible to its database owner. Transport, project credentials, identity resolution and reports will be defined as separate, tested steps.
+This is one private dataset, accessible to its database owner. Project credentials, identity resolution and reports will be defined as separate, tested steps.
+
+## Browser producer
+
+```js
+import {createPitwall} from 'pitwall/client';
+const events=[];
+const client=createPitwall({send:event=>events.push(event),namespace:'my-app'});
+client.track('Button Clicked',{button:'start'});
+```
+
+`send` selects the transport. Each record carries `id`, `event`, `distinct_id`, `occurred_at` and `properties`. The producer persists an opaque browser ID and session ID under the namespace, and attaches coarse device/browser metadata. It preserves repeated actions and tolerates transport failure.
+
+`client.time(step, properties, priority)` returns a stop function. It measures foreground time, excluding hidden tabs and overlapping parent/overlay intervals. `views` optionally maps steps to the host's event names. React consumers can use `usePitwallTime` from `pitwall/react`; React is an optional peer dependency.
 
 ## Reading behind this brick
 

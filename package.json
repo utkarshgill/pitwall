@@ -5,10 +5,12 @@
   "description": "Small, readable event analytics. Starting with one event.",
   "type": "module",
   "license": "MIT",
-  "files": ["events.sql"],
-  "exports": { "./events.sql": "./events.sql" },
-  "scripts": { "test": "node --test events.test.mjs", "demo": "node demo.mjs" },
+  "files": ["events.sql", "client.js", "react.js"],
+  "exports": { "./events.sql": "./events.sql", "./client": "./client.js", "./react": "./react.js" },
+  "scripts": { "test": "node --test", "demo": "node demo.mjs" },
   "engines": { "node": ">=24" },
   "devDependencies": { "@electric-sql/pglite": "0.5.8" },
+  "peerDependencies": { "react": ">=18" },
+  "peerDependenciesMeta": { "react": { "optional": true } },
   "packageManager": "pnpm@11.25.0"
 }
