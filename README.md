@@ -26,6 +26,12 @@ select * from pitwall.events where id = 'e1';
 
 This is one private dataset, accessible to its database owner. Project credentials, identity resolution and reports will be defined as separate, tested steps.
 
+## Command line
+
+`node cli.js events events.jsonl` reads event records and writes JSON lines to stdout. Use `node cli.js events` to read stdin. Blank lines are ignored; records retain their IDs and properties. Invalid input fails with its line number. This command reads events; it does not deduplicate or store them.
+
+The same streaming reader is available as `readEvents(input)` from `pitwall/jsonl`. It accepts a Node readable stream and closes it on completion, error or early exit. No database, web server or React dependency is needed to run the CLI.
+
 ## Browser producer
 
 ```js
