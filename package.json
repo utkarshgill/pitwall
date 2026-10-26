@@ -1,0 +1,12 @@
+{
+  "name": "pitwall",
+  "version": "0.0.1",
+  "private": true,
+  "description": "Small, readable event analytics. Starting with one event.",
+  "type": "module",
+  "license": "MIT",
+  "scripts": { "test": "node --test events.test.mjs" },
+  "engines": { "node": ">=24" },
+  "devDependencies": { "@electric-sql/pglite": "0.5.8" },
+  "packageManager": "pnpm@11.25.0"
+}
