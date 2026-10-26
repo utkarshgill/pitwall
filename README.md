@@ -4,7 +4,7 @@ Small, readable event analytics. The first brick is an event store.
 
 An event has an ID, name, occurrence time, opaque actor/device ID, and JSON properties. Storage adds `received_at`. The actor ID is recorded as supplied; identity merging is a later decision.
 
-[events.sql](events.sql) contains one PostgreSQL table and one append operation. No Supabase project or running server is required for the tests:
+[events.sql](events.sql) contains one PostgreSQL table and one append operation. Run the checks with Node.js 24 and pnpm; no Supabase project or running server is required:
 
 ```sh
 pnpm install

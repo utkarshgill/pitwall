@@ -67,7 +67,8 @@ test('accepted events survive closing and reopening a file-backed database',asyn
   let disk;
   try {
     disk=await PGlite.create(directory);await disk.exec(schema);
-    await disk.query('select pitwall.append($1,$2,$3,$4,$5)',Object.values(event));
+    await disk.query('select pitwall.append($1,$2,$3,$4,$5)',
+      [event.id,event.event,event.distinct_id,event.occurred_at,event.properties]);
     const original=(await disk.query('select * from pitwall.events')).rows;
     await disk.close();disk=null;
     disk=await PGlite.create(directory);
