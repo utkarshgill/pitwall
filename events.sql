@@ -12,16 +12,16 @@ create table if not exists pitwall.events (
 revoke all on pitwall.events from public;
 
 create or replace function pitwall.append(
-  event_id text, event_name text, actor_id text, event_time timestamptz default null, event_properties jsonb default '{}'
+  event_id text, event_name text, actor_id text, event_time timestamptz, event_properties jsonb default '{}'
 ) returns boolean language plpgsql set search_path = '' as $$
 declare added integer;
 begin
   insert into pitwall.events(id,event,distinct_id,occurred_at,properties)
-    values(event_id,event_name,actor_id,coalesce(event_time,clock_timestamp()),event_properties) on conflict(id) do nothing;
+    values(event_id,event_name,actor_id,event_time,event_properties) on conflict(id) do nothing;
   get diagnostics added = row_count;
   if added = 0 and not exists (
     select 1 from pitwall.events e where e.id = event_id and e.event = event_name
-      and e.distinct_id = actor_id and (event_time is null or e.occurred_at = event_time) and e.properties = event_properties
+      and e.distinct_id = actor_id and e.occurred_at = event_time and e.properties = event_properties
   ) then raise exception 'Event ID reused with different facts'; end if;
   return added = 1;
 end;

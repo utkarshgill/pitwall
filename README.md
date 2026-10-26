@@ -22,7 +22,7 @@ select pitwall.append(
 select * from pitwall.events where id = 'e1';
 ```
 
-`append` returns true for a new event and false for an identical retry. A reused ID with different supplied facts raises an error. An omitted/null occurrence time uses the server's observation time on the first append; retries retain it. JSON object key order does not affect equality. Separate event IDs retain repeated actions, including actions with equal timestamps. The receipt time stays fixed on retries.
+`append` returns true for a new event and false for an identical retry. The producer supplies occurrence time; storage adds receipt time. A reused ID with different facts raises an error. JSON object key order does not affect equality. Separate event IDs retain repeated actions, including actions with equal timestamps. The receipt time stays fixed on retries.
 
 This is one private dataset, accessible to its database owner. Transport, project credentials, identity resolution and reports will be defined as separate, tested steps.
 
