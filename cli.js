@@ -22,7 +22,8 @@ try {
       const {PGlite}=await import('@electric-sql/pglite'),db=await PGlite.create();
       try {
         await db.exec(await readFile(new URL('./report.sql',import.meta.url),'utf8'));
-        console.log(JSON.stringify((await db.query('select pitwall.report($1,$2) as result',[events,query])).rows[0].result));
+        const result=(await db.query('select pitwall.report($1,$2) as result',[events,query])).rows[0].result;
+        await pipeline([JSON.stringify(result)+'\n'],process.stdout);
       } finally {await db.close();}
     }
   }
