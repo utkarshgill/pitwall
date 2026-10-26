@@ -1,6 +1,8 @@
 import assert from 'node:assert/strict';
 import {before, beforeEach, after, test} from 'node:test';
-import {readFile} from 'node:fs/promises';
+import {readFile,mkdtemp,rm} from 'node:fs/promises';
+import {tmpdir} from 'node:os';
+import {join} from 'node:path';
 import {PGlite} from '@electric-sql/pglite';
 
 const schema = await readFile(new URL('./events.sql',import.meta.url),'utf8');
@@ -58,4 +60,17 @@ test('the store and append operation are private by default',async()=>{
     await tx.exec('set local role reader');await tx.query('select * from pitwall.events');
   }),/permission denied/);
   assert.equal((await db.query("select has_function_privilege('reader','pitwall.append(text,text,text,timestamptz,jsonb)','EXECUTE') as allowed")).rows[0].allowed,false);
+});
+
+test('accepted events survive closing and reopening a file-backed database',async()=>{
+  const directory=await mkdtemp(join(tmpdir(),'pitwall-'));
+  let disk;
+  try {
+    disk=await PGlite.create(directory);await disk.exec(schema);
+    await disk.query('select pitwall.append($1,$2,$3,$4,$5)',Object.values(event));
+    const original=(await disk.query('select * from pitwall.events')).rows;
+    await disk.close();disk=null;
+    disk=await PGlite.create(directory);
+    assert.deepEqual((await disk.query('select * from pitwall.events')).rows,original);
+  } finally {await disk?.close();await rm(directory,{recursive:true,force:true});}
 });

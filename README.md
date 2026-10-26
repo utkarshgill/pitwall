@@ -9,9 +9,10 @@ An event has an ID, name, occurrence time, opaque actor/device ID, and JSON prop
 ```sh
 pnpm install
 pnpm test
+pnpm demo
 ```
 
-The tests run the SQL in PGlite, an embedded PostgreSQL. To use an existing PostgreSQL database, install the same file with `psql "$DATABASE_URL" -f events.sql` as its owner.
+The tests run the SQL in PGlite, an embedded PostgreSQL. The demo appends one event, retries it, closes the database, reopens `.data`, and prints the stored row. To use an existing PostgreSQL database, install the same file with `psql "$DATABASE_URL" -f events.sql` as its owner.
 
 ```sql
 select pitwall.append(
