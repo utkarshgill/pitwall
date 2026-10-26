@@ -5,6 +5,8 @@
   "description": "Small, readable event analytics. Starting with one event.",
   "type": "module",
   "license": "MIT",
+  "files": ["events.sql"],
+  "exports": { "./events.sql": "./events.sql" },
   "scripts": { "test": "node --test events.test.mjs", "demo": "node demo.mjs" },
   "engines": { "node": ">=24" },
   "devDependencies": { "@electric-sql/pglite": "0.5.8" },
