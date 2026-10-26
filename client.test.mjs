@@ -57,3 +57,9 @@ test('transport failure and disabled capture cannot break the host',async t=>{
   client.track('Button Clicked');assert.equal(client.time('screen'),undefined);assert.equal(sent,0);
   await Promise.resolve();
 });
+
+test('foreground observations are not clipped to a transport limit',t=>{
+  const {client,events}=browser(t),stop=client.time('screen');
+  t.mock.timers.setTime(Date.now()+600001);stop();
+  assert.equal(events.find(e=>e.event==='step_time').properties.duration_ms,600001);
+});

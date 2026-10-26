@@ -30,7 +30,7 @@ export function createPitwall({ send, key = () => crypto.randomUUID(), enabled =
     const flush = (leavingVisible = false) => {
       const now = performance.now(), duration = Math.round(now - since); since = now;
       if (!closed && current() === entry && (leavingVisible || document.visibilityState === 'visible') && duration > 0)
-        track('step_time', { ...context, step, duration_ms: Math.min(duration, 300000) });
+        track('step_time', { ...context, step, duration_ms: duration });
     };
     const entry = { priority, flush, reset };
     timers.push(entry);
