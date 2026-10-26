@@ -53,6 +53,8 @@ Funnel steps require separate occurrences in timestamp/ID order. Each person cou
 
 The same streaming reader is available as `readEvents(input)` from `pitwall/jsonl`. It accepts a Node readable stream and closes it on completion, error or early exit. No database, web server or React dependency is needed to run the CLI.
 
+To calculate a report locally, run `node cli.js report events.jsonl --query '{"event":"Build finished","from":"2026-01-01T00:00:00Z","to":"2026-02-01T00:00:00Z"}'`. This loads the same `report.sql` into an ephemeral PGlite database, prints JSON and closes it. PGlite is an optional dependency; installations that omit optional dependencies can still stream events or install the SQL in their own PostgreSQL. Reports load the supplied batch into memory; `events` remains streaming.
+
 ## Browser producer
 
 ```js

@@ -10,7 +10,7 @@
   "bin": { "pitwall": "cli.js" },
   "scripts": { "test": "node --test", "demo": "node demo.mjs" },
   "engines": { "node": ">=24" },
-  "devDependencies": { "@electric-sql/pglite": "0.5.8" },
+  "optionalDependencies": { "@electric-sql/pglite": "0.5.8" },
   "peerDependencies": { "react": ">=18" },
   "peerDependenciesMeta": { "react": { "optional": true } },
   "packageManager": "pnpm@11.25.0"

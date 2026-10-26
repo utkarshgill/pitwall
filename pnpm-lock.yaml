@@ -11,7 +11,7 @@ importers:
       react:
         specifier: '>=18'
         version: 19.3.1
-    devDependencies:
+    optionalDependencies:
       '@electric-sql/pglite':
         specifier: 0.5.8
         version: 0.5.8
@@ -27,6 +27,7 @@ packages:
 
 snapshots:
 
-  '@electric-sql/pglite@0.5.8': {}
+  '@electric-sql/pglite@0.5.8':
+    optional: true
 
   react@19.3.1: {}

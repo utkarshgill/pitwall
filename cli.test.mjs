@@ -34,3 +34,11 @@ test('a consumer closing the pipe exits cleanly', {timeout:10000},async t=>{
   child.stdout.once('data',()=>child.stdout.destroy());
   const [code]=await once(child,'close');assert.equal(code,0,error);assert.equal(error,'');
 });
+
+test('the report command uses the same SQL engine without an application server',()=>{
+  const query={event:'Build finished',from:'2025-12-31T00:00:00Z',to:'2026-01-02T00:00:00Z'};
+  const result=run(['report','--query',JSON.stringify(query)],line);
+  assert.equal(result.status,0,result.stderr);const report=JSON.parse(result.stdout);
+  assert.equal(report.insight.total,1);assert.equal(report.insight.people,1);assert.equal(report.events[0].id,event.id);
+  assert.equal(run(['report'],line).status,1);
+});
